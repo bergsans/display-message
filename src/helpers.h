@@ -15,17 +15,28 @@ struct graphics {
   SDL_bool isRenderLoop;
 };
 
+struct application {
+  string message;
+  int width = 800;
+  int height = 800;
+  int fontSize = 30;
+};
+
 struct position {
   int x;
   int y;
 };
 
-void renderLoop(graphics sdl);
-
-graphics initSDL(const char *fileContent);
-
-string getScratchOutput(string fileName);
+const int ERROR = -1;
 
 position getPosition();
 
+void renderLoop(graphics sdl);
+
+graphics initSDL(application app);
+
 void quitSDL(graphics sdl);
+
+string getScratchOutput(string fileName);
+
+application processArguments(int len, char *args[], application app);
