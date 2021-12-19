@@ -12,6 +12,7 @@ flags:
 -height {int}
 -fontpath {string}
 -fontsize {int}
+-scratchfile {string}
 ./build/msg -message "Hello, world!" -width 500 -heigt 500 -fontsize 15
 
 ```

@@ -1,11 +1,11 @@
 #include "helpers.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
-#include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <vector>
+
 SDL_Color Blue = {0, 255, 255};
 
 position getPosition() {
@@ -24,9 +24,9 @@ graphics initSDL(config app) {
   }
   graphics sdl;
   position pos = getPosition();
-  sdl.window = SDL_CreateWindow("output", pos.x, pos.y, 800, 800, 0);
+  sdl.window =
+      SDL_CreateWindow("output", pos.x, pos.y, app.width, app.height, 0);
   sdl.renderer = SDL_CreateRenderer(sdl.window, -1, SDL_RENDERER_ACCELERATED);
-  cout << app.fontPath;
   sdl.font = TTF_OpenFont(app.fontPath.c_str(), app.fontSize);
   if (sdl.font == NULL) {
     cout << "Initialization of font failed" << endl;
@@ -75,6 +75,10 @@ config processArguments(int len, char *args[]) {
       app.width = i++ < len ? atoi(args[i]) : app.width;
     } else if (args[i] == string("-height")) {
       app.height = i++ < len ? atoi(args[i]) : app.height;
+    } else if (args[i] == string("-scratchfile")) {
+      app.scratchFile =
+          i++ < len ? args[i]
+                    : string(std::filesystem::current_path()) + app.scratchFile;
     } else if (args[i] == string("-fontpath")) {
       app.fontPath = i++ < len ? args[i] : app.fontPath;
     } else if (args[i] == string("-fontsize")) {
@@ -87,8 +91,9 @@ config processArguments(int len, char *args[]) {
       cout << "-message \"{string}\"" << endl;
       cout << "-width {int}" << endl;
       cout << "-height {int}" << endl;
-      cout << "-font {string}" << endl;
+      cout << "-fontpath {string}" << endl;
       cout << "-fontsize {int}" << endl;
+      cout << "-scratchfile {string}" << endl;
       cout << "\n"
            << "Example:"
            << "./build/msg -message \"Hello, world!\" -width 500 -height 500"

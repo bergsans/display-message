@@ -19,6 +19,7 @@ struct config {
   string message;
   int width = 800;
   int height = 800;
+  string scratchFile = "scratch-output";
   string fontPath = "/home/bergsans/.local/share/fonts/iosevka-regular.ttf";
   int fontSize = 30;
 };
