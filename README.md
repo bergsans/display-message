@@ -7,12 +7,13 @@ A user modifies the content of file `scratch-output` by use of an external appli
 ## cli
 ```bash
 flags:
--message "{text...}"
+-message "{string}"
 -width {int}
 -height {int}
+-fontpath {string}
 -fontsize {int}
-
 ./build/msg -message "Hello, world!" -width 500 -heigt 500 -fontsize 15
+
 ```
 
 
@@ -35,7 +36,7 @@ endfunction
 vnoremap <leader>i
     :w! ~/Documents/dev/display-message/scratch-output<CR>
     :call GetResult()<CR>
-    :!~/Documents/dev/display-message/build/fn-res<CR>
+    :!~/Documents/dev/display-message/build/msg<CR>
 ```
 
 This how the evaluation of a few selected lines of JavaScvript is shown:

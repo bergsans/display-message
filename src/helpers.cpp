@@ -1,9 +1,11 @@
 #include "helpers.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <algorithm>
 #include <fstream>
+#include <iostream>
 #include <sstream>
-
+#include <vector>
 SDL_Color Blue = {0, 255, 255};
 
 position getPosition() {
@@ -15,7 +17,7 @@ position getPosition() {
   return pos;
 }
 
-graphics initSDL(application app) {
+graphics initSDL(config app) {
   if (SDL_Init(SDL_INIT_VIDEO) == ERROR || TTF_Init() == ERROR) {
     cout << "Initialization failed" << endl;
     exit(1);
@@ -24,8 +26,8 @@ graphics initSDL(application app) {
   position pos = getPosition();
   sdl.window = SDL_CreateWindow("output", pos.x, pos.y, 800, 800, 0);
   sdl.renderer = SDL_CreateRenderer(sdl.window, -1, SDL_RENDERER_ACCELERATED);
-  sdl.font = TTF_OpenFont(
-      "/home/bergsans/.local/share/fonts/iosevka-regular.ttf", app.fontSize);
+  cout << app.fontPath;
+  sdl.font = TTF_OpenFont(app.fontPath.c_str(), app.fontSize);
   if (sdl.font == NULL) {
     cout << "Initialization of font failed" << endl;
     exit(1);
@@ -62,27 +64,34 @@ void quitSDL(graphics sdl) {
   SDL_Quit();
 }
 
-application processArguments(int len, char *args[], application app) {
+config processArguments(int len, char *args[]) {
+  config app;
+  bool messageFound = false;
   for (int i = 1; i < len; i++) {
     if (args[i] == string("-message")) {
+      messageFound = true;
       app.message = i++ < len ? args[i] : "";
     } else if (args[i] == string("-width")) {
       app.width = i++ < len ? atoi(args[i]) : app.width;
     } else if (args[i] == string("-height")) {
       app.height = i++ < len ? atoi(args[i]) : app.height;
+    } else if (args[i] == string("-fontpath")) {
+      app.fontPath = i++ < len ? args[i] : app.fontPath;
     } else if (args[i] == string("-fontsize")) {
       app.fontSize = i++ < len ? atoi(args[i]) : app.fontSize;
-      cout << app.fontSize;
     } else if (args[i] == string("--help")) {
       cout << "Display Message v. 0.1" << endl;
+      cout << "======================" << endl;
       cout << "\n"
            << "flags:" << endl;
-      cout << "-message \"{text...}\"" << endl;
+      cout << "-message \"{string}\"" << endl;
       cout << "-width {int}" << endl;
       cout << "-height {int}" << endl;
+      cout << "-font {string}" << endl;
       cout << "-fontsize {int}" << endl;
       cout << "\n"
-           << "./build/msg -message \"Hello, world!\" -width 500 -heigt 500 "
+           << "Example:"
+           << "./build/msg -message \"Hello, world!\" -width 500 -height 500"
               "-fontsize 15"
            << endl;
       exit(0);
@@ -91,12 +100,17 @@ application processArguments(int len, char *args[], application app) {
       exit(1);
     }
   }
+  if (!messageFound) {
+    app.message = getScratchOutput(
+        "/home/bergsans/Documents/dev/display-message/scratch-output");
+  }
   return app;
 }
 
 string getScratchOutput(string fileName) {
+  config app;
   ifstream f(fileName);
-  string content;
+  string content = "";
   if (f) {
     ostringstream ss;
     ss << f.rdbuf();

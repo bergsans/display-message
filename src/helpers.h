@@ -15,10 +15,11 @@ struct graphics {
   SDL_bool isRenderLoop;
 };
 
-struct application {
+struct config {
   string message;
   int width = 800;
   int height = 800;
+  string fontPath = "/home/bergsans/.local/share/fonts/iosevka-regular.ttf";
   int fontSize = 30;
 };
 
@@ -33,10 +34,10 @@ position getPosition();
 
 void renderLoop(graphics sdl);
 
-graphics initSDL(application app);
+graphics initSDL(config app);
 
 void quitSDL(graphics sdl);
 
 string getScratchOutput(string fileName);
 
-application processArguments(int len, char *args[], application app);
+config processArguments(int len, char *args[]);
