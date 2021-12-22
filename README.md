@@ -1,5 +1,8 @@
 # Display Message
-This application display output in a floating window until a key is pressed, useful in a milieu such as X-Monad. A user can interact with the application in two ways, either by sending messages in as cli arguments or by replacing the content in a scratch file.
+This application display output in a floating window until a key is pressed, useful in a milieu such as X-Monad. A user can interact with the application in 3 ways, 
+* either by sending messages in as cli arguments
+* by replacing the content in a scratch file
+* using Unix pipes
 
 ## Scratch file
 A user modifies the content of file `scratch-output` by use of an external application such as Bash. See Vim example for a possible use-case. `./build/fn-res` displays this content in a 800x800 floating window.
@@ -14,10 +17,10 @@ flags:
 -fontsize {int}
 -scratchfile {string}
 ./build/msg -message "Hello, world!" -width 500 -heigt 500 -fontsize 15
-
 ```
 
-
+# Unix pipes
+![](assets/screenshot-3.png)
 
 # Background
 In Vim it's possible, by visual selection, to evaluate parts* of a code written in an interpreted language. Out of the box, the result from such an operation is outputted in the command window in NeoVim (in contrast to Vim outputting it as a background process at stdout). This is a nice feature, especially since you can mix-in any interpretive language on the fly.

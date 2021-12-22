@@ -6,6 +6,8 @@
 #include <iostream>
 #include <sstream>
 
+using namespace std;
+
 SDL_Color Blue = {0, 255, 255};
 
 position getPosition() {
@@ -46,8 +48,7 @@ graphics initSDL(config app) {
 void renderLoop(graphics sdl) {
   while (!sdl.isRenderLoop) {
     SDL_PollEvent(&sdl.event);
-    if (sdl.event.type == SDL_KEYDOWN &&
-        sdl.event.key.keysym.sym == SDLK_ESCAPE) {
+    if (sdl.event.type == SDL_KEYDOWN) {
       sdl.isRenderLoop = SDL_TRUE;
     }
     SDL_RenderClear(sdl.renderer);
@@ -64,11 +65,19 @@ void quitSDL(graphics sdl) {
   SDL_Quit();
 }
 
-config processArguments(int len, char *args[]) {
+config processArguments(int len, char *args[], string maybePipeMessage) {
   config app;
+  bool isPipeMessage = maybePipeMessage.length() > 0;
+  if (isPipeMessage == 1) {
+    app.message = maybePipeMessage;
+  }
+  if (len == 1 && isPipeMessage == 0) {
+    app.message = getScratchOutput(app.scratchFile);
+    return app;
+  }
   bool messageFound = false;
   for (int i = 1; i < len; i++) {
-    if (args[i] == string("-message")) {
+    if (args[i] == string("-message") && !isPipeMessage) {
       messageFound = true;
       app.message = i++ < len ? args[i] : "";
     } else if (args[i] == string("-width")) {
@@ -76,38 +85,44 @@ config processArguments(int len, char *args[]) {
     } else if (args[i] == string("-height")) {
       app.height = i++ < len ? atoi(args[i]) : app.height;
     } else if (args[i] == string("-scratchfile")) {
-      app.scratchFile =
-          i++ < len ? args[i]
-                    : string(std::filesystem::current_path()) + app.scratchFile;
+      app.scratchFile = i++ < len ? args[i] : "";
     } else if (args[i] == string("-fontpath")) {
       app.fontPath = i++ < len ? args[i] : app.fontPath;
     } else if (args[i] == string("-fontsize")) {
       app.fontSize = i++ < len ? atoi(args[i]) : app.fontSize;
     } else if (args[i] == string("--help")) {
-      cout << "Display Message v. 0.1" << endl;
-      cout << "======================" << endl;
-      cout << "\n"
-           << "flags:" << endl;
-      cout << "-message \"{string}\"" << endl;
-      cout << "-width {int}" << endl;
-      cout << "-height {int}" << endl;
-      cout << "-fontpath {string}" << endl;
-      cout << "-fontsize {int}" << endl;
-      cout << "-scratchfile {string}" << endl;
-      cout << "\n"
+      cout << "Display Message v. 0.1"
+           << "\n"
+           << "======================"
+           << "\n"
+           << "\n"
+           << "flags:"
+           << "\n"
+           << "-message \"{string}\""
+           << "\n"
+           << "-width {int}"
+           << "\n"
+           << "-height {int}"
+           << "\n"
+           << "-fontpath {string}"
+           << "\n"
+           << "-fontsize {int}"
+           << "\n"
+           << "-scratchfile {string}"
+           << "\n"
+           << "\n"
            << "Example:"
            << "./build/msg -message \"Hello, world!\" -width 500 -height 500"
               "-fontsize 15"
            << endl;
       exit(0);
     } else {
-      std::cerr << "invalid argument";
+      std::cerr << "Invalid argument. " << args[i] << " not allowed" << endl;
       exit(1);
     }
   }
-  if (!messageFound) {
-    app.message = getScratchOutput(
-        "/home/bergsans/Documents/dev/display-message/scratch-output");
+  if (!messageFound && isPipeMessage == 0) {
+    app.message = getScratchOutput(app.scratchFile);
   }
   return app;
 }
